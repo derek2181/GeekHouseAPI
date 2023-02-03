@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GeeekHouseAPI.Data
+namespace GeeekHouseAPI.Models
 {
-    public class Product
+    public class ImageModel
     {
-       
         public int Id { get; set; }
+
+        public string Path { get; set; }
+
         public string Name { get; set; }
 
-        public Image Image { get; set; }
-        public ICollection<Category> Categories { get; set; }
+        public string Mime { get; set; }
     }
-
 }

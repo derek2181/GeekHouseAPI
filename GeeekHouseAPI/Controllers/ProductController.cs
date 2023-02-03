@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
+using GeeekHouseAPI.Utils;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 namespace GeeekHouseAPI.Controllers
 {   [ApiController]
@@ -10,9 +14,11 @@ namespace GeeekHouseAPI.Controllers
       public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
-        public ProductController(IProductRepository productRepository)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment)
         {
             _productRepository = productRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
         [HttpGet("recent")]
        public async Task<IActionResult> RecentProducts()
@@ -37,6 +43,17 @@ namespace GeeekHouseAPI.Controllers
         {
             try
             {
+               
+                if(product.ImageFile != null)
+                {
+
+                    ImageModel image = await ImageUploader.Upload("products", product.ImageFile);
+
+                    product.Image = image;
+
+                }
+
+
                 var id= await _productRepository.AddBook(product, categories);
                 return Created("products/" + id, "SUCCESS");
 

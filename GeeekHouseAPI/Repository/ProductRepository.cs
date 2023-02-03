@@ -46,7 +46,8 @@ namespace GeeekHouseAPI.Repository
             var product = new Product()
             {
                 Name = productModel.Name,
-                Categories= categories
+                Categories= categories,
+                Image = productModel.Image != null ? new Image() { Path=productModel.Image.Path, Name = productModel.Image.Name, Mime = productModel.Image.Mime} : null
             };
            
            context.Product.Add(product);

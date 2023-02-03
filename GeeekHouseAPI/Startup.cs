@@ -35,6 +35,7 @@ namespace GeeekHouseAPI
                 options=>options.UseSqlServer(Configuration.GetConnectionString("GeekHouseDB")));
 
             services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<IImageRepository, ImageRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
