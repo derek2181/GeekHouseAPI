@@ -7,7 +7,7 @@ namespace GeeekHouseAPI.Repository
     {
         Task<List<ProductModel>> GetRecentProducts();
         Task<ProductModel> GetProductById(int id);
-        Task<int> AddBook(ProductModel productModel, List<int> categories);
+        Task<int> AddProduct(ProductModel productModel, List<int> categories,int availability);
 
         Task<List<ProductModel>> GetProductsByCategory(int category);
 

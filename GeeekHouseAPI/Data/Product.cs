@@ -11,7 +11,9 @@ namespace GeeekHouseAPI.Data
         public int Id { get; set; }
         public string Name { get; set; }
 
+        public double Price { get; set; }
         public Image Image { get; set; }
+        public Availability Availability { get; set; }
         public ICollection<Category> Categories { get; set; }
     }
 

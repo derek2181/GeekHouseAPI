@@ -22,10 +22,23 @@ namespace GeeekHouseAPI.Repository
             var data = await context.Product.Select(p => new ProductModel()
             {
                 Id= p.Id,
-                Name=p.Name
+                Name=p.Name,
+                Image=new ImageModel
+                { Id=p.Image.Id,
+                  Mime=p.Image.Mime,
+                  Path=p.Image.Path,
+                  Name=p.Image.Name
+                },
+                Availability = p.Availability != null ? new AvailabilityModel
+                {
+                    Description = p.Availability.Description,
+                    Id = p.Availability.Id
+                } : null,
+
 
             }).Take(8).ToListAsync();
             return data;
+
         }
 
         public async Task<ProductModel> GetProductById(int id)
@@ -33,24 +46,39 @@ namespace GeeekHouseAPI.Repository
             var data = await context.Product.Select(p => new ProductModel()
             {
                 Id = p.Id,
-                Name = p.Name
+                Name = p.Name,
+                Image = p.Image != null ? new ImageModel
+                {
+                    Id = p.Image.Id,
+                    Mime = p.Image.Mime,
+                    Path = p.Image.Path,
+                    Name = p.Image.Name
+                } :null,
+                Availability = p.Availability != null ? new AvailabilityModel
+                {
+                    Description = p.Availability.Description,
+                    Id = p.Availability.Id
+                }:null,
+                Price=p.Price,
             }).Where(p => p.Id == id).SingleOrDefaultAsync();
 
             return data;
         }
 
-        public async Task<int> AddBook(ProductModel productModel, List<int> categoryList)
+        public async Task<int> AddProduct(ProductModel productModel, List<int> categoryList,int availabilityType)
         {
             var categories = await context.Category.Where(c => categoryList.Contains(c.Id)).ToListAsync();
-
+            var availability = await context.Availability.Where(a => a.Id == availabilityType).FirstOrDefaultAsync();
             var product = new Product()
             {
                 Name = productModel.Name,
                 Categories= categories,
-                Image = productModel.Image != null ? new Image() { Path=productModel.Image.Path, Name = productModel.Image.Name, Mime = productModel.Image.Mime} : null
+                Image = productModel.Image != null ? new Image() { Path=productModel.Image.Path, Name = productModel.Image.Name, Mime = productModel.Image.Mime} : null,
+                Availability = availability,
+                Price=productModel.Price
             };
-           
-           context.Product.Add(product);
+            
+            context.Product.Add(product);
 
             await context.SaveChangesAsync();
 

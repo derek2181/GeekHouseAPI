@@ -39,7 +39,7 @@ namespace GeeekHouseAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] List<int> categories)
+        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] List<int> categories,[FromForm] int availability)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace GeeekHouseAPI.Controllers
                 }
 
 
-                var id= await _productRepository.AddBook(product, categories);
+                var id= await _productRepository.AddProduct(product, categories,availability);
                 return Created("products/" + id, "SUCCESS");
 
             }

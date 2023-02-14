@@ -20,5 +20,6 @@ namespace GeeekHouseAPI.Data
         public DbSet<Category> Category { get; set; }
         public DbSet<Image> Image { get; set; }
 
+        public DbSet<Availability> Availability { get; set; }
     }
 }
