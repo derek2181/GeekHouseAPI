@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
@@ -82,12 +80,13 @@ namespace GeeekHouseAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
-        [HttpGet("{id}")]
-        public async Task<IActionResult> ProductById([FromRoute]int id)
+        [HttpGet("{name}")]
+        public async Task<IActionResult> ProductByName([FromRoute]string name)
         {
             try
             {
-                var product = await _productRepository.GetProductById(id);
+                var actualName = name.Replace('-',' ');
+                var product = await _productRepository.GetProductByName(actualName);
                 if (product == null)
                 {
                   return  NotFound();

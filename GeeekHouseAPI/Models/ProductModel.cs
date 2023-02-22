@@ -15,6 +15,9 @@ namespace GeeekHouseAPI
         public IFormFile? ImageFile { get; set; }
 
         public double Price{get;set;}
+        public string Description { get; set; }
+        public string Path { get; set; }
+        public int Stock { get; set; }
 
         public AvailabilityModel Availability { get; set; }
         public ImageModel Image { get; set; }

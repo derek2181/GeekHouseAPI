@@ -37,9 +37,11 @@ namespace GeeekHouseAPI.Utils
 
             try
             {
-              
+                FileStream filestream=new FileStream((Path.Combine(root, folder)), FileMode.Create);
+               
+               await file.CopyToAsync(filestream);
 
-                await file.CopyToAsync(new FileStream(Path.Combine(root,folder), FileMode.Create));
+               filestream.Close();
 
             } catch( Exception e)
             {

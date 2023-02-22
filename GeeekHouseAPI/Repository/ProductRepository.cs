@@ -34,14 +34,17 @@ namespace GeeekHouseAPI.Repository
                     Description = p.Availability.Description,
                     Id = p.Availability.Id
                 } : null,
-
+                Price=p.Price,
+                Path= p.Name.Replace(' ','-'),
+                Description=p.Name,
+                Stock=p.Stock
 
             }).Take(8).ToListAsync();
             return data;
 
         }
 
-        public async Task<ProductModel> GetProductById(int id)
+        public async Task<ProductModel> GetProductByName(string name)
         {
             var data = await context.Product.Select(p => new ProductModel()
             {
@@ -60,7 +63,9 @@ namespace GeeekHouseAPI.Repository
                     Id = p.Availability.Id
                 }:null,
                 Price=p.Price,
-            }).Where(p => p.Id == id).SingleOrDefaultAsync();
+                Description = p.Name,
+                Stock = p.Stock
+            }).Where(p => p.Name == name).SingleOrDefaultAsync();
 
             return data;
         }
