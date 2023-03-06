@@ -46,6 +46,7 @@ namespace GeeekHouseAPI
                 app.UseDeveloperExceptionPage();
                
             }
+
             app.UseCors(config => config.AllowAnyOrigin());
             app.UseHttpsRedirection();
 

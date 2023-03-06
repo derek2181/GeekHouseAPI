@@ -23,12 +23,13 @@ namespace GeeekHouseAPI.Repository
             {
                 Id= p.Id,
                 Name=p.Name,
-                Image=new ImageModel
-                { Id=p.Image.Id,
-                  Mime=p.Image.Mime,
-                  Path=p.Image.Path,
-                  Name=p.Image.Name
-                },
+                Image=p.Image != null ?  p.Image.Select(i=> new ImageModel
+                {
+                    Id=i.Id,
+                    Mime=i.Mime,
+                    Name=i.Name,
+                    Path=i.Path
+                }).FirstOrDefault() : null,
                 Availability = p.Availability != null ? new AvailabilityModel
                 {
                     Description = p.Availability.Description,
@@ -46,17 +47,11 @@ namespace GeeekHouseAPI.Repository
 
         public async Task<ProductModel> GetProductByName(string name)
         {
-            var data = await context.Product.Select(p => new ProductModel()
+            var product = await context.Product.Select(p => new ProductModel()
             {
                 Id = p.Id,
                 Name = p.Name,
-                Image = p.Image != null ? new ImageModel
-                {
-                    Id = p.Image.Id,
-                    Mime = p.Image.Mime,
-                    Path = p.Image.Path,
-                    Name = p.Image.Name
-                } :null,
+      
                 Availability = p.Availability != null ? new AvailabilityModel
                 {
                     Description = p.Availability.Description,
@@ -67,7 +62,17 @@ namespace GeeekHouseAPI.Repository
                 Stock = p.Stock
             }).Where(p => p.Name == name).SingleOrDefaultAsync();
 
-            return data;
+            var images = await context.Image.Where(i => i.product.Id == product.Id).Select(i => new ImageModel
+            {
+                Id=i.Id,
+                Mime=i.Mime,
+                Name=i.Name,
+                Path=i.Path
+            }).ToListAsync();
+
+
+            product.Images = images;
+            return product;
         }
 
         public async Task<int> AddProduct(ProductModel productModel, List<int> categoryList,int availabilityType)
@@ -77,8 +82,15 @@ namespace GeeekHouseAPI.Repository
             var product = new Product()
             {
                 Name = productModel.Name,
-                Categories= categories,
-                Image = productModel.Image != null ? new Image() { Path=productModel.Image.Path, Name = productModel.Image.Name, Mime = productModel.Image.Mime} : null,
+                Categories = categories,
+                Image =productModel.Images != null ? productModel.Images.ToList().Select(i => new Image
+                {
+                Id=i.Id,
+                Mime=i.Mime,
+                Name=i.Name,
+                Path=i.Path
+                }).ToList() : null
+                ,
                 Availability = availability,
                 Price=productModel.Price
             };

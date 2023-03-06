@@ -14,5 +14,7 @@ namespace GeeekHouseAPI.Models
         public string Name { get; set; }
 
         public string Mime { get; set; }
+
+        public ProductModel productModel { get; set; }
     }
 }

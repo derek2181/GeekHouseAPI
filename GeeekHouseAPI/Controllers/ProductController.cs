@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
 using GeeekHouseAPI.Utils;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 namespace GeeekHouseAPI.Controllers
 {   [ApiController]
@@ -42,13 +44,15 @@ namespace GeeekHouseAPI.Controllers
             try
             {
                
-                if(product.ImageFile != null)
+                if(product.ImageFiles != null)
                 {
+                    product.Images = new Collection<ImageModel>();
+                    foreach(IFormFile file in product.ImageFiles)
+                    {
+                    ImageModel image = await ImageUploader.Upload("products", file);
 
-                    ImageModel image = await ImageUploader.Upload("products", product.ImageFile);
-
-                    product.Image = image;
-
+                    product.Images.Add(image);
+                    }
                 }
 
 

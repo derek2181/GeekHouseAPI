@@ -12,6 +12,7 @@ namespace GeeekHouseAPI
         public int Id { get; set; }
         public string Name { get; set; }
 
+        public ICollection<IFormFile?> ImageFiles { get; set; }
         public IFormFile? ImageFile { get; set; }
 
         public double Price{get;set;}
@@ -21,6 +22,8 @@ namespace GeeekHouseAPI
 
         public AvailabilityModel Availability { get; set; }
         public ImageModel Image { get; set; }
+
+        public ICollection<ImageModel> Images { get; set; }
         public ICollection<CategoryModel> Categories { get; set; }
     }
 }
