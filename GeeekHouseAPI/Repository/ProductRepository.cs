@@ -16,7 +16,37 @@ namespace GeeekHouseAPI.Repository
         {
             this.context = context;
         }
+        public async Task<List<ProductModel>> GetRelatedProductsByCategory(int[] categoriesRelated)
+        {
 
+            var data = await context.Product.Where(p => p.Categories.Any(category => categoriesRelated.Contains(category.Id)))
+              .Select(p => new ProductModel
+              {
+
+                  Id = p.Id,
+                  Name = p.Name,
+                  Image = p.Image != null ? p.Image.Select(i => new ImageModel
+                  {
+                      Id = i.Id,
+                      Mime = i.Mime,
+                      Name = i.Name,
+                      Path = i.Path
+                  }).FirstOrDefault() : null,
+                  Availability = p.Availability != null ? new AvailabilityModel
+                  {
+                      Description = p.Availability.Description,
+                      Id = p.Availability.Id
+                  } : null,
+                  Price = p.Price,
+                  Path = p.Name.Replace(' ', '-'),
+                  Description = p.Description,
+                  Stock = p.Stock
+              }
+              ).Take(8).ToListAsync();
+
+
+            return data;
+        }
         public async Task<List<ProductModel>> GetRecentProducts()
         {
             var data = await context.Product.Select(p => new ProductModel()
@@ -37,7 +67,7 @@ namespace GeeekHouseAPI.Repository
                 } : null,
                 Price=p.Price,
                 Path= p.Name.Replace(' ','-'),
-                Description=p.Name,
+                Description=p.Description,
                 Stock=p.Stock
 
             }).Take(8).ToListAsync();
@@ -58,8 +88,9 @@ namespace GeeekHouseAPI.Repository
                     Id = p.Availability.Id
                 }:null,
                 Price=p.Price,
-                Description = p.Name,
-                Stock = p.Stock
+                Description = p.Description,
+                Stock = p.Stock,
+               
             }).Where(p => p.Name == name).SingleOrDefaultAsync();
 
             var images = await context.Image.Where(i => i.product.Id == product.Id).Select(i => new ImageModel
@@ -70,7 +101,12 @@ namespace GeeekHouseAPI.Repository
                 Path=i.Path
             }).ToListAsync();
 
-
+            var categories = await context.Category.Where(c => c.Products.Any(p => p.Id == product.Id)).Select(c=>new CategoryModel
+            {
+                Id=c.Id,
+                Name=c.name
+            }).ToListAsync();
+            product.Categories = categories;
             product.Images = images;
             return product;
         }
@@ -88,9 +124,11 @@ namespace GeeekHouseAPI.Repository
                 Id=i.Id,
                 Mime=i.Mime,
                 Name=i.Name,
-                Path=i.Path
+                Path=i.Path,
+                
                 }).ToList() : null
                 ,
+                Description=productModel.Description,
                 Availability = availability,
                 Price=productModel.Price
             };
@@ -112,7 +150,7 @@ namespace GeeekHouseAPI.Repository
                 Name=p.Name
             }).ToListAsync() ;
 
-
+        
             //List<ProductModel> data = new List<ProductModel>();
 
             //foreach(var product in products)

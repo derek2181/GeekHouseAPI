@@ -37,7 +37,24 @@ namespace GeeekHouseAPI.Controllers
             }
            
         }
+        [HttpGet("related")]
+        public async Task<IActionResult> RelatedProducts([FromQuery] int[] categories)
+        {
+            try
+            {
+                var products = await _productRepository.GetRelatedProductsByCategory(categories);
+                if (products == null)
+                {
+                    return BadRequest("There was en error with the repository");
+                }
+                return Ok(products);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
 
+        }
         [HttpPost]
         public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] List<int> categories,[FromForm] int availability)
         {
