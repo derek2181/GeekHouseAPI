@@ -4,14 +4,16 @@ using GeeekHouseAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GeeekHouseAPI.Migrations
 {
     [DbContext(typeof(GeekHouseContext))]
-    partial class GeekHouseContextModelSnapshot : ModelSnapshot
+    [Migration("20230425022459_insertDate2")]
+    partial class insertDate2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,9 +147,6 @@ namespace GeeekHouseAPI.Migrations
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("insertDate")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

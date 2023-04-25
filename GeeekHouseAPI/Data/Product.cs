@@ -17,6 +17,8 @@ namespace GeeekHouseAPI.Data
         public ICollection<Image> Image { get; set; }
         public Availability Availability { get; set; }
         public ICollection<Category> Categories { get; set; }
+
+        public DateTime insertDate { get; set; } = DateTime.Now;
     }
 
 }

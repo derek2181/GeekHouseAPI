@@ -30,7 +30,10 @@ namespace GeeekHouseAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.IgnoreNullValues = true;
+            });
             services.AddDbContext<GeekHouseContext>(
                 options=>options.UseSqlServer(Configuration.GetConnectionString("GeekHouseDB")));
 
@@ -46,7 +49,7 @@ namespace GeeekHouseAPI
                 app.UseDeveloperExceptionPage();
                
             }
-
+           
             app.UseCors(config => config.AllowAnyOrigin());
             app.UseHttpsRedirection();
 

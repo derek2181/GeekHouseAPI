@@ -140,6 +140,81 @@ namespace GeeekHouseAPI.Repository
             return product.Id;
 
         }
+        public async Task<List<ProductModel>> GetProductsAdvancedSearch(string productType,string searchText,string title,string orderBy)
+        {
+            var category = await context.Category.Where(p => p.name.Equals(productType)).Select(c => new CategoryModel
+            {
+                Id = c.Id,
+                Name = c.name
+            }).FirstOrDefaultAsync();
+
+            var categoryFilter= await context.Category.Where(p => p.name.Equals(title)).Select(c => new CategoryModel
+            {
+                Id = c.Id,
+                Name = c.name
+            }).FirstOrDefaultAsync();
+
+            var query = context.Product.AsQueryable();
+
+            if (categoryFilter!=null)
+            {
+                query = query.Where(p => p.Categories.Any(c => c.Id == category.Id && c.Id==categoryFilter.Id));
+            }
+            else
+            {
+                query = query.Where(p => p.Categories.Any(c => c.Id == category.Id));
+            }
+
+
+            if (searchText.Length!=0)
+            {
+                query = query.Where(p => p.Name.Contains(searchText));
+            }
+
+            if (orderBy.Length != 0)
+            {
+                switch (orderBy)
+                {
+                    case "A-Z":
+                        query = query.OrderByDescending(p => p.Name);
+                        break;
+
+                    case "Z-A":
+                        query = query.OrderBy(p => p.Name);
+                        break;
+                    case "Nuevos":
+                        query = query.OrderByDescending(p => p.insertDate);
+                        break;
+
+                    case "Viejos":
+                        query = query.OrderBy(p => p.insertDate);
+                        break;
+                }
+            }
+
+            var data = await query.Select(p => new ProductModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Image = p.Image != null ? p.Image.Select(i => new ImageModel
+                {
+                    Id = i.Id,
+                    Mime = i.Mime,
+                    Name = i.Name,
+                    Path = i.Path
+                }).FirstOrDefault() : null,
+                Availability = p.Availability != null ? new AvailabilityModel
+                {
+                    Description = p.Availability.Description,
+                    Id = p.Availability.Id
+                } : null,
+                Price = p.Price,
+                Path = p.Name.Replace(' ', '-'),
+                Description = p.Description,
+                Stock = p.Stock
+            }).ToListAsync();
+            return data;
+        }
         public async Task<List<ProductModel>> GetProductsByCategory(int category)
         {
             //TODO: Ver como mapear las categorias, ver como hacer que no truene y hacer el query bien
