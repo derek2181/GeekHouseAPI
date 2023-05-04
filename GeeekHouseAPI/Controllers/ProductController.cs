@@ -123,11 +123,13 @@ namespace GeeekHouseAPI.Controllers
            
         }
         [HttpGet("advanced-search")]
-        public async Task<IActionResult> AdvancedSearch([FromQuery ]string productType = "",[FromQuery]string searchText = "", [FromQuery]string title = "", [FromQuery] string orderBy = "")
+        public async Task<IActionResult> AdvancedSearch([FromQuery ]string productType = "",[FromQuery]string searchText = "", [FromQuery]string title = "",
+            [FromQuery] string orderBy = "",[FromQuery] int pageSize=1,[FromQuery] int pageIndex=0)
         {
             try
             {
-                return Ok(await _productRepository.GetProductsAdvancedSearch(productType,searchText, title, orderBy));
+                
+                return Ok(await _productRepository.GetProductsAdvancedSearch(productType,searchText, title, orderBy,pageSize,pageIndex));
             }catch(Exception e)
             {
                 return BadRequest(e.Message);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using GeeekHouseAPI.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GeeekHouseAPI.Repository
@@ -11,7 +12,7 @@ namespace GeeekHouseAPI.Repository
 
         Task<List<ProductModel>> GetProductsByCategory(int category);
         Task<List<ProductModel>> GetRelatedProductsByCategory(int[] category);
-        Task<List<ProductModel>> GetProductsAdvancedSearch(string productType,string searchText, string category, string orderBy);
+        Task<AdvancedSearchModel> GetProductsAdvancedSearch(string productType,string searchText, string category, string orderBy,int pageSize,int pageIndex);
 
     }
 }

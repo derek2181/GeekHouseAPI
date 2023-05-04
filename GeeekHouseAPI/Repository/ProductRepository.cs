@@ -140,7 +140,8 @@ namespace GeeekHouseAPI.Repository
             return product.Id;
 
         }
-        public async Task<List<ProductModel>> GetProductsAdvancedSearch(string productType,string searchText,string title,string orderBy)
+        public async Task<AdvancedSearchModel> GetProductsAdvancedSearch(string productType,string searchText,string title,
+            string orderBy,int pageSize,int pageIndex)
         {
             var category = await context.Category.Where(p => p.name.Equals(productType)).Select(c => new CategoryModel
             {
@@ -158,7 +159,7 @@ namespace GeeekHouseAPI.Repository
 
             if (categoryFilter!=null)
             {
-                query = query.Where(p => p.Categories.Any(c => c.Id == category.Id && c.Id==categoryFilter.Id));
+                query = query.Where(p => p.Categories.Any(c => c.Id == categoryFilter.Id) && p.Categories.Any(c => c.Id == category.Id));
             }
             else
             {
@@ -176,11 +177,12 @@ namespace GeeekHouseAPI.Repository
                 switch (orderBy)
                 {
                     case "A-Z":
-                        query = query.OrderByDescending(p => p.Name);
+                        query = query.OrderBy(p => p.Name);
                         break;
 
                     case "Z-A":
-                        query = query.OrderBy(p => p.Name);
+                 
+                        query = query.OrderByDescending(p => p.Name);
                         break;
                     case "Nuevos":
                         query = query.OrderByDescending(p => p.insertDate);
@@ -192,7 +194,7 @@ namespace GeeekHouseAPI.Repository
                 }
             }
 
-            var data = await query.Select(p => new ProductModel
+            List<ProductModel> products = await query.Select(p => new ProductModel
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -212,8 +214,11 @@ namespace GeeekHouseAPI.Repository
                 Path = p.Name.Replace(' ', '-'),
                 Description = p.Description,
                 Stock = p.Stock
-            }).ToListAsync();
-            return data;
+            }).Skip(pageSize*pageIndex).Take(pageSize).ToListAsync();
+            
+            AdvancedSearchModel advancedSearchModel = new AdvancedSearchModel { products = products, count = query.Count() };
+
+            return advancedSearchModel;
         }
         public async Task<List<ProductModel>> GetProductsByCategory(int category)
         {
