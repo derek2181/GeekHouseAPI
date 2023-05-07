@@ -14,9 +14,9 @@ namespace GeeekHouseAPI.Data
         public void Seed()
         {
             modelBuilder.Entity<Category>().HasData(
-                   new Category() { Id = 1, name = "Funko" },
-                   new Category() { Id = 2, name = "Videogame" },
-                   new Category() { Id = 3, name = "Console" }
+                   new Category() { Id = 1, Name = "Funko"},
+                   new Category() { Id = 2, Name = "Videojuegos" },
+                   new Category() { Id = 3, Name = "Consolas" }
 
 
             );

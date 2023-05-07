@@ -38,11 +38,11 @@ namespace GeeekHouseAPI.Controllers
            
         }
         [HttpGet("related")]
-        public async Task<IActionResult> RelatedProducts([FromQuery] int[] categories)
+        public async Task<IActionResult> RelatedProducts([FromQuery] int category,[FromQuery] int productId)
         {
             try
             {
-                var products = await _productRepository.GetRelatedProductsByCategory(categories);
+                var products = await _productRepository.GetRelatedProductsByCategory(category, productId);
                 if (products == null)
                 {
                     return BadRequest("There was en error with the repository");
@@ -56,7 +56,7 @@ namespace GeeekHouseAPI.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] List<int> categories,[FromForm] int availability)
+        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] int category,int[] subcategories,[FromForm] int availability)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace GeeekHouseAPI.Controllers
                 }
 
 
-                var id= await _productRepository.AddProduct(product, categories,availability);
+                var id= await _productRepository.AddProduct(product,category, subcategories,availability);
                 return Created("products/" + id, "SUCCESS");
 
             }
@@ -123,13 +123,13 @@ namespace GeeekHouseAPI.Controllers
            
         }
         [HttpGet("advanced-search")]
-        public async Task<IActionResult> AdvancedSearch([FromQuery ]string productType = "",[FromQuery]string searchText = "", [FromQuery]string title = "",
+        public async Task<IActionResult> AdvancedSearch([FromQuery ]string category = "",[FromQuery]string searchText = "", [FromQuery]string subcategory = "",
             [FromQuery] string orderBy = "",[FromQuery] int pageSize=1,[FromQuery] int pageIndex=0)
         {
             try
             {
                 
-                return Ok(await _productRepository.GetProductsAdvancedSearch(productType,searchText, title, orderBy,pageSize,pageIndex));
+                return Ok(await _productRepository.GetProductsAdvancedSearch(category, searchText, subcategory, orderBy,pageSize,pageIndex));
             }catch(Exception e)
             {
                 return BadRequest(e.Message);

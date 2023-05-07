@@ -16,10 +16,10 @@ namespace GeeekHouseAPI.Repository
         {
             this.context = context;
         }
-        public async Task<List<ProductModel>> GetRelatedProductsByCategory(int[] categoriesRelated)
+        public async Task<List<ProductModel>> GetRelatedProductsByCategory(int category,int productId)
         {
 
-            var data = await context.Product.Where(p => p.Categories.Any(category => categoriesRelated.Contains(category.Id)))
+            var data = await context.Product.Where(p => p.Category.Id==category && p.Id!= productId)
               .Select(p => new ProductModel
               {
 
@@ -87,7 +87,8 @@ namespace GeeekHouseAPI.Repository
                     Description = p.Availability.Description,
                     Id = p.Availability.Id
                 }:null,
-                Price=p.Price,
+                Category = new CategoryModel { Id = p.Category.Id, Name = p.Category.Name },
+                Price =p.Price,
                 Description = p.Description,
                 Stock = p.Stock,
                
@@ -101,24 +102,21 @@ namespace GeeekHouseAPI.Repository
                 Path=i.Path
             }).ToListAsync();
 
-            var categories = await context.Category.Where(c => c.Products.Any(p => p.Id == product.Id)).Select(c=>new CategoryModel
-            {
-                Id=c.Id,
-                Name=c.name
-            }).ToListAsync();
-            product.Categories = categories;
+          
             product.Images = images;
             return product;
         }
 
-        public async Task<int> AddProduct(ProductModel productModel, List<int> categoryList,int availabilityType)
+        public async Task<int> AddProduct(ProductModel productModel,int categoryId,int[] subcategoriesList,int availabilityType)
         {
-            var categories = await context.Category.Where(c => categoryList.Contains(c.Id)).ToListAsync();
+            var category = await context.Category.Where(c => c.Id==categoryId).FirstOrDefaultAsync();
+            var subcategories = await context.Subcategory.Where(c => subcategoriesList.Contains(c.Id)).ToListAsync();
             var availability = await context.Availability.Where(a => a.Id == availabilityType).FirstOrDefaultAsync();
             var product = new Product()
             {
                 Name = productModel.Name,
-                Categories = categories,
+                Category = category,
+                Subcategories=subcategories,
                 Image =productModel.Images != null ? productModel.Images.ToList().Select(i => new Image
                 {
                 Id=i.Id,
@@ -140,30 +138,30 @@ namespace GeeekHouseAPI.Repository
             return product.Id;
 
         }
-        public async Task<AdvancedSearchModel> GetProductsAdvancedSearch(string productType,string searchText,string title,
+        public async Task<AdvancedSearchModel> GetProductsAdvancedSearch(string category,string searchText,string subcategory,
             string orderBy,int pageSize,int pageIndex)
         {
-            var category = await context.Category.Where(p => p.name.Equals(productType)).Select(c => new CategoryModel
+            var categoryType = await context.Category.Where(p => p.Name.Equals(category)).Select(c => new CategoryModel
             {
                 Id = c.Id,
-                Name = c.name
+                Name = c.Name
             }).FirstOrDefaultAsync();
 
-            var categoryFilter= await context.Category.Where(p => p.name.Equals(title)).Select(c => new CategoryModel
+            var categoryFilter= await context.Subcategory.Where(p => p.Name.Equals(subcategory)).Select(c => new CategoryModel
             {
                 Id = c.Id,
-                Name = c.name
+                Name = c.Name
             }).FirstOrDefaultAsync();
 
             var query = context.Product.AsQueryable();
 
             if (categoryFilter!=null)
             {
-                query = query.Where(p => p.Categories.Any(c => c.Id == categoryFilter.Id) && p.Categories.Any(c => c.Id == category.Id));
+                query = query.Where(p => p.Category.Id == categoryType.Id && p.Subcategories.Any(c => c.Id== categoryFilter.Id));
             }
             else
             {
-                query = query.Where(p => p.Categories.Any(c => c.Id == category.Id));
+                query = query.Where(p => p.Category.Id == categoryType.Id);
             }
 
 
@@ -224,7 +222,7 @@ namespace GeeekHouseAPI.Repository
         {
             //TODO: Ver como mapear las categorias, ver como hacer que no truene y hacer el query bien
 
-            var data = await context.Product.Where(p => p.Categories.Any(c => c.Id == category)).Select(p=>new ProductModel()
+            var data = await context.Product.Where(p => p.Subcategories.Any(c => c.Id == category)).Select(p=>new ProductModel()
             {
                 Id=p.Id,
                 Name=p.Name

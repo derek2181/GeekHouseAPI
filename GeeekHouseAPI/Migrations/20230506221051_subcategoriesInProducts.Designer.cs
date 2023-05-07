@@ -4,14 +4,16 @@ using GeeekHouseAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GeeekHouseAPI.Migrations
 {
     [DbContext(typeof(GeekHouseContext))]
-    partial class GeekHouseContextModelSnapshot : ModelSnapshot
+    [Migration("20230506221051_subcategoriesInProducts")]
+    partial class subcategoriesInProducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

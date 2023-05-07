@@ -9,5 +9,6 @@ namespace GeeekHouseAPI.Repository
     public interface ICategoryRepository
     {
         Task<List<CategoryModel>> getAllCategories();
+        Task<List<CategoryModel>> getAllSubcategories(string category);
     }
 }

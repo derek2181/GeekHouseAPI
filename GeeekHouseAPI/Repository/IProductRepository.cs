@@ -8,11 +8,11 @@ namespace GeeekHouseAPI.Repository
     {
         Task<List<ProductModel>> GetRecentProducts();
         Task<ProductModel> GetProductByName(string id);
-        Task<int> AddProduct(ProductModel productModel, List<int> categories,int availability);
+        Task<int> AddProduct(ProductModel productModel,int cateogory, int[] categories,int availability);
 
         Task<List<ProductModel>> GetProductsByCategory(int category);
-        Task<List<ProductModel>> GetRelatedProductsByCategory(int[] category);
-        Task<AdvancedSearchModel> GetProductsAdvancedSearch(string productType,string searchText, string category, string orderBy,int pageSize,int pageIndex);
+        Task<List<ProductModel>> GetRelatedProductsByCategory(int category,int productId);
+        Task<AdvancedSearchModel> GetProductsAdvancedSearch(string category,string searchText, string subcategory, string orderBy,int pageSize,int pageIndex);
 
     }
 }

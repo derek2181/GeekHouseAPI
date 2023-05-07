@@ -30,5 +30,18 @@ namespace GeeekHouseAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpGet]
+        [Route("subcategories")]
+        public async Task<IActionResult> listAllSubcategories([FromQuery] string category)
+        {
+            try
+            {
+                var subcategories = await _categoryRepository.getAllSubcategories(category);
+                return Ok(subcategories);
+            }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
     }
 }

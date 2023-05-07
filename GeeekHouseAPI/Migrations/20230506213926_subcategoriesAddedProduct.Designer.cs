@@ -4,14 +4,16 @@ using GeeekHouseAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GeeekHouseAPI.Migrations
 {
     [DbContext(typeof(GeekHouseContext))]
-    partial class GeekHouseContextModelSnapshot : ModelSnapshot
+    [Migration("20230506213926_subcategoriesAddedProduct")]
+    partial class subcategoriesAddedProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,7 +60,7 @@ namespace GeeekHouseAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Name")
+                    b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -69,17 +71,17 @@ namespace GeeekHouseAPI.Migrations
                         new
                         {
                             Id = 1,
-                            Name = "Funko"
+                            name = "Funko"
                         },
                         new
                         {
                             Id = 2,
-                            Name = "Videojuegos"
+                            name = "Videojuegos"
                         },
                         new
                         {
                             Id = 3,
-                            Name = "Consolas"
+                            name = "Consolas"
                         });
                 });
 
@@ -153,32 +155,22 @@ namespace GeeekHouseAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CategoryId")
+                    b.Property<int?>("ProductId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
+                    b.Property<int?>("categoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoryId");
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("categoryId");
 
                     b.ToTable("Subcategory");
-                });
-
-            modelBuilder.Entity("ProductSubcategory", b =>
-                {
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubcategoriesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductsId", "SubcategoriesId");
-
-                    b.HasIndex("SubcategoriesId");
-
-                    b.ToTable("ProductSubcategory");
                 });
 
             modelBuilder.Entity("GeeekHouseAPI.Data.Image", b =>
@@ -207,38 +199,29 @@ namespace GeeekHouseAPI.Migrations
 
             modelBuilder.Entity("GeeekHouseAPI.Data.Subcategory", b =>
                 {
-                    b.HasOne("GeeekHouseAPI.Data.Category", "Category")
-                        .WithMany("Subcategories")
-                        .HasForeignKey("CategoryId");
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("ProductSubcategory", b =>
-                {
                     b.HasOne("GeeekHouseAPI.Data.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Subcategories")
+                        .HasForeignKey("ProductId");
 
-                    b.HasOne("GeeekHouseAPI.Data.Subcategory", null)
-                        .WithMany()
-                        .HasForeignKey("SubcategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("GeeekHouseAPI.Data.Category", "category")
+                        .WithMany("subcategories")
+                        .HasForeignKey("categoryId");
+
+                    b.Navigation("category");
                 });
 
             modelBuilder.Entity("GeeekHouseAPI.Data.Category", b =>
                 {
                     b.Navigation("Products");
 
-                    b.Navigation("Subcategories");
+                    b.Navigation("subcategories");
                 });
 
             modelBuilder.Entity("GeeekHouseAPI.Data.Product", b =>
                 {
                     b.Navigation("Image");
+
+                    b.Navigation("Subcategories");
                 });
 #pragma warning restore 612, 618
         }
