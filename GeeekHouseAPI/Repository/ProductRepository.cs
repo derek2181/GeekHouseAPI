@@ -49,7 +49,7 @@ namespace GeeekHouseAPI.Repository
         }
         public async Task<List<ProductModel>> GetRecentProducts()
         {
-            var data = await context.Product.Select(p => new ProductModel()
+            var data = await context.Product.Where(p=>p.Availability.Id==1).Select(p => new ProductModel()
             {
                 Id= p.Id,
                 Name=p.Name,
@@ -138,7 +138,7 @@ namespace GeeekHouseAPI.Repository
             return product.Id;
 
         }
-        public async Task<AdvancedSearchModel> GetProductsAdvancedSearch(string category,string searchText,string subcategory,
+        public async Task<SearchModel> GetProductsAdvancedSearch(string category,string searchText,string subcategory,
             string orderBy,int pageSize,int pageIndex)
         {
             var categoryType = await context.Category.Where(p => p.Name.Equals(category)).Select(c => new CategoryModel
@@ -159,7 +159,7 @@ namespace GeeekHouseAPI.Repository
             {
                 query = query.Where(p => p.Category.Id == categoryType.Id && p.Subcategories.Any(c => c.Id== categoryFilter.Id));
             }
-            else
+            else if(categoryType!=null)
             {
                 query = query.Where(p => p.Category.Id == categoryType.Id);
             }
@@ -213,8 +213,8 @@ namespace GeeekHouseAPI.Repository
                 Description = p.Description,
                 Stock = p.Stock
             }).Skip(pageSize*pageIndex).Take(pageSize).ToListAsync();
-            
-            AdvancedSearchModel advancedSearchModel = new AdvancedSearchModel { products = products, count = query.Count() };
+
+            SearchModel advancedSearchModel = new SearchModel { products = products, count = query.Count() };
 
             return advancedSearchModel;
         }
@@ -247,6 +247,7 @@ namespace GeeekHouseAPI.Repository
 
             return data;
         }
-        
+
+     
     }
 }

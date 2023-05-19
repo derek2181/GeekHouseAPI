@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GeeekHouseAPI.Models
 {
-    public class AdvancedSearchModel
+    public class SearchModel
     {
         public ICollection<ProductModel> products { get; set; }
 

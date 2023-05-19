@@ -23,7 +23,7 @@ namespace GeeekHouseAPI.Data
 
             modelBuilder.Entity<Availability>().HasData(
                     new Availability() { Id = 1, Description = "DISPONIBLE" },
-                    new Availability() { Id = 2, Description = "PREORDEN" },
+                    new Availability() { Id = 2, Description = "PREVENTA" },
                     new Availability() { Id = 3, Description = "AGOTADO" }
             );
         }

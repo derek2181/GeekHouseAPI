@@ -122,6 +122,7 @@ namespace GeeekHouseAPI.Controllers
 
            
         }
+      
         [HttpGet("advanced-search")]
         public async Task<IActionResult> AdvancedSearch([FromQuery ]string category = "",[FromQuery]string searchText = "", [FromQuery]string subcategory = "",
             [FromQuery] string orderBy = "",[FromQuery] int pageSize=1,[FromQuery] int pageIndex=0)

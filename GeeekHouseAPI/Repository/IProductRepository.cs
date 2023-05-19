@@ -12,7 +12,9 @@ namespace GeeekHouseAPI.Repository
 
         Task<List<ProductModel>> GetProductsByCategory(int category);
         Task<List<ProductModel>> GetRelatedProductsByCategory(int category,int productId);
-        Task<AdvancedSearchModel> GetProductsAdvancedSearch(string category,string searchText, string subcategory, string orderBy,int pageSize,int pageIndex);
+        Task<SearchModel> GetProductsAdvancedSearch(string category,string searchText, string subcategory, string orderBy,int pageSize,int pageIndex);
+
+    
 
     }
 }
