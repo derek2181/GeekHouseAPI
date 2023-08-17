@@ -18,6 +18,9 @@ namespace GeeekHouseAPI.Utils
         /// <param name="entityFolderName">the folder's name that is going to be located on uploads folder on server</param>
         /// <param name="file">the image file to be uploaded</param>
         /// <returns>The image model filled with all file specs. if it fails,this method returns null</returns>
+        /// 
+
+
         public static async Task<ImageModel> Upload(string entityFolderName, IFormFile file)
         {
 

@@ -1,5 +1,6 @@
 using GeeekHouseAPI.Data;
 using GeeekHouseAPI.Repository;
+using GeeekHouseAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -40,6 +41,7 @@ namespace GeeekHouseAPI
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<IImageRepository, ImageRepository>();
             services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IStorageService, StorageService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

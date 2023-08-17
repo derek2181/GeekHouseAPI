@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading.Tasks;
 using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
+using GeeekHouseAPI.Services;
 using GeeekHouseAPI.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+
 namespace GeeekHouseAPI.Controllers
 {   [ApiController]
     [Route("products")]
@@ -15,17 +19,22 @@ namespace GeeekHouseAPI.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment)
+        private readonly IStorageService _storageService;
+        private readonly IConfiguration _configuration;
+        public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment,
+            IStorageService storageService, IConfiguration configuration)
         {
             _productRepository = productRepository;
             _webHostEnvironment = webHostEnvironment;
+            _storageService=storageService;
+            this._configuration = configuration;
         }
         [HttpGet("recent")]
        public async Task<IActionResult> RecentProducts()
         {
             try
             {
-                var products = await _productRepository.GetRecentProducts();
+                var products = await _productRepository.GetRecentFunkoPops();
                 if (products==null)
                 {
                     return BadRequest("There was en error with the repository");
@@ -42,6 +51,7 @@ namespace GeeekHouseAPI.Controllers
         {
             try
             {
+          
                 var products = await _productRepository.GetRelatedProductsByCategory(category, productId);
                 if (products == null)
                 {
@@ -56,25 +66,56 @@ namespace GeeekHouseAPI.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] int category,int[] subcategories,[FromForm] int availability)
+        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] int category, [FromForm]  int[] subcategories,[FromForm] int availability)
         {
             try
             {
-               
+                var result = new S3ResponseDTO();
                 if(product.ImageFiles != null)
                 {
                     product.Images = new Collection<ImageModel>();
                     foreach(IFormFile file in product.ImageFiles)
                     {
-                    ImageModel image = await ImageUploader.Upload("products", file);
+                      // ImageModel image = await ImageUploader.Upload("products", file);
 
-                    product.Images.Add(image);
+                      
+                        await using var memoryStream = new MemoryStream();
+                        await file.CopyToAsync(memoryStream);
+
+                        var fileExt = Path.GetExtension(file.FileName);
+                        var objName = $"{Guid.NewGuid()}{fileExt}";
+
+                        var s3Obj = new S3Object()
+                        {
+                            BucketName = "geekhouse-bucket",
+                            InputStream = memoryStream,
+                            Name = objName
+
+                        };
+
+                        var cred = new AWSCredentials()
+                        {
+                            AwsKey = _configuration["AWSConfig:AWSAccessKey"],
+                            AwsSecretKey = _configuration["AWSConfig:AWSSecretKey"]
+                        };
+
+                       result = await _storageService.UploadFileAsync(s3Obj, cred);
+
+                        var image = new ImageModel()
+                        {
+                            Name = file.FileName,
+                            Mime = file.ContentType,
+                            Path = _configuration["AWSConfig:S3BucketURL"] + objName,
+                            objectName= objName
+                        };
+                        product.Images.Add(image);
+
                     }
                 }
 
 
                 var id= await _productRepository.AddProduct(product,category, subcategories,availability);
-                return Created("products/" + id, "SUCCESS");
+                return Created("images/" + result, "SUCCESS");
 
             }
             catch (Exception e)
