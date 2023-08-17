@@ -1,5 +1,6 @@
 ﻿using GeeekHouseAPI.Data;
 using GeeekHouseAPI.Models;
+using GeeekHouseAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,12 @@ namespace GeeekHouseAPI.Repository
     public class ProductRepository : IProductRepository
     {
         private readonly GeekHouseContext context;
+        private readonly IStorageService _storageService;
 
-        public ProductRepository(GeekHouseContext context)
+        public ProductRepository(GeekHouseContext context, IStorageService storageService)
         {
             this.context = context;
+            this._storageService = storageService;
         }
         public async Task<List<ProductModel>> GetRelatedProductsByCategory(int category,int productId)
         {
@@ -47,9 +50,9 @@ namespace GeeekHouseAPI.Repository
 
             return data;
         }
-        public async Task<List<ProductModel>> GetRecentProducts()
+        public async Task<List<ProductModel>> GetRecentFunkoPops()
         {
-            var data = await context.Product.Where(p=>p.Availability.Id==1).Select(p => new ProductModel()
+            var data = await context.Product.Where(p=>p.Availability.Id==1 && p.Category.Id==1).Select(p => new ProductModel()
             {
                 Id= p.Id,
                 Name=p.Name,
@@ -123,6 +126,7 @@ namespace GeeekHouseAPI.Repository
                 Mime=i.Mime,
                 Name=i.Name,
                 Path=i.Path,
+                objectName=i.objectName
                 
                 }).ToList() : null
                 ,
@@ -130,11 +134,20 @@ namespace GeeekHouseAPI.Repository
                 Availability = availability,
                 Price=productModel.Price
             };
+            try
+            {
+                context.Product.Add(product);
+                await context.SaveChangesAsync();
+
+
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
+
+
             
-            context.Product.Add(product);
-
-            await context.SaveChangesAsync();
-
             return product.Id;
 
         }
@@ -188,6 +201,14 @@ namespace GeeekHouseAPI.Repository
 
                     case "Viejos":
                         query = query.OrderBy(p => p.insertDate);
+                        break;
+
+                    case "Disponible":
+                        query = query.OrderByDescending(p => p.Availability.Id==1);
+                        break;
+
+                    case "Preorden":
+                        query = query.OrderByDescending(p => p.Availability.Id == 2);
                         break;
                 }
             }
