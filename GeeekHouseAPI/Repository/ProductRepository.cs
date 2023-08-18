@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace GeeekHouseAPI.Repository
 {
@@ -127,12 +129,13 @@ namespace GeeekHouseAPI.Repository
                 Name=i.Name,
                 Path=i.Path,
                 objectName=i.objectName
-                
                 }).ToList() : null
                 ,
                 Description=productModel.Description,
                 Availability = availability,
-                Price=productModel.Price
+                Price=productModel.Price,
+                Stock=productModel.Stock,
+                insertDate=DateTime.Now,
             };
             try
             {
@@ -269,6 +272,27 @@ namespace GeeekHouseAPI.Repository
             return data;
         }
 
-     
+        public async Task<List<ProductTableModel>> GetAllProductsAdmin()
+        {
+            List<ProductTableModel> products = await context.Product.Select(p => new ProductTableModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Description = p.Description,
+                Stock = p.Stock,
+                Category=p.Category!=null ? p.Category.Name : "SIN CATEGORIA",
+                Availability=p.Availability!=null ? p.Availability.Description : "SIN VALOR",
+                Image = p.Image != null ? p.Image.Select(i => new ImageModel
+                {
+                    Id = i.Id,
+                    Mime = i.Mime,
+                    Name = i.Name,
+                    Path = i.Path
+                }).FirstOrDefault() : null
+            }).ToListAsync();
+
+            return products;
+        }
     }
 }

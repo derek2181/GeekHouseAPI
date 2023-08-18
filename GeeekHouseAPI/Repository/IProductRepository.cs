@@ -14,7 +14,7 @@ namespace GeeekHouseAPI.Repository
         Task<List<ProductModel>> GetRelatedProductsByCategory(int category,int productId);
         Task<SearchModel> GetProductsAdvancedSearch(string category,string searchText, string subcategory, string orderBy,int pageSize,int pageIndex);
 
-    
+        Task<List<ProductTableModel>> GetAllProductsAdmin(); 
 
     }
 }

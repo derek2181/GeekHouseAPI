@@ -29,6 +29,24 @@ namespace GeeekHouseAPI.Controllers
             _storageService=storageService;
             this._configuration = configuration;
         }
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetAllProductsAdmin()
+        {
+            try
+            {
+                var products = await _productRepository.GetAllProductsAdmin();
+                if (products == null)
+                {
+                    return BadRequest("There was en error with the repository");
+                }
+                return Ok(products);
+            }
+            catch(Exception e)
+            {
+
+                return BadRequest(e.Message);
+            }
+        }
         [HttpGet("recent")]
        public async Task<IActionResult> RecentProducts()
         {

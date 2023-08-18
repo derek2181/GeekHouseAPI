@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GeeekHouseAPI.Migrations
 {
     [DbContext(typeof(GeekHouseContext))]
-    [Migration("20230611032522_S3AmazonObjectName")]
-    partial class S3AmazonObjectName
+    [Migration("20230817214443_StartDatabase")]
+    partial class StartDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
