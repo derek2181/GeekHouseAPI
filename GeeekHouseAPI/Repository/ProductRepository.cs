@@ -242,6 +242,34 @@ namespace GeeekHouseAPI.Repository
 
             return advancedSearchModel;
         }
+        public async Task<ProductCatalogueModel> GetProductCatalogue()
+        {
+            var productCatalogueModel = new ProductCatalogueModel();
+
+            var categories =await context.Category.Select(c => new CategoryModel()
+            {
+                Id=c.Id,
+                Name=c.Name
+            }).ToListAsync();
+
+            var subcategories = await context.Subcategory.Select(c => new CategoryModel()
+            {
+                Id = c.Id,
+                Name = c.Name
+            }).ToListAsync();
+
+            var availabilities = await context.Availability.Select(c => new AvailabilityModel()
+            {
+             Description=c.Description,
+             Id=c.Id
+            }).ToListAsync();
+
+            productCatalogueModel.categories = categories;
+            productCatalogueModel.availabilities = availabilities;
+            productCatalogueModel.subcategories = subcategories;
+
+            return productCatalogueModel;
+        }
         public async Task<List<ProductModel>> GetProductsByCategory(int category)
         {
             //TODO: Ver como mapear las categorias, ver como hacer que no truene y hacer el query bien

@@ -36,7 +36,7 @@ namespace GeeekHouseAPI
                 options.JsonSerializerOptions.IgnoreNullValues = true;
             });
             services.AddDbContext<GeekHouseContext>(
-                options=>options.UseSqlServer(Configuration.GetConnectionString("GeekHouseDBSolistica")));
+                options=>options.UseSqlServer(Configuration.GetConnectionString("GeekHouseDB")));
 
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<IImageRepository, ImageRepository>();

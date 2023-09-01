@@ -47,6 +47,25 @@ namespace GeeekHouseAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [HttpGet("catalogue")]
+        public async Task<IActionResult> GetProductCatalogue()
+        {
+            try
+            {
+                var products = await _productRepository.GetProductCatalogue();
+                if (products == null)
+                {
+                    return BadRequest("There was en error with the repository");
+                }
+                return Ok(products);
+            }
+            catch (Exception e)
+            {
+
+                return BadRequest(e.Message);
+            }
+        }
+
         [HttpGet("recent")]
        public async Task<IActionResult> RecentProducts()
         {
