@@ -8,7 +8,7 @@ namespace GeeekHouseAPI.Repository
     {
         Task<List<ProductModel>> GetRecentFunkoPops();
         Task<ProductModel> GetProductByName(string id);
-        Task<int> AddProduct(ProductModel productModel,int cateogory, int[] categories,int availability);
+        Task<int> AddProduct(ProductModel productModel,int cateogory, int subcategoryId, int availability);
 
         Task<List<ProductModel>> GetProductsByCategory(int category);
         Task<List<ProductModel>> GetRelatedProductsByCategory(int category,int productId);

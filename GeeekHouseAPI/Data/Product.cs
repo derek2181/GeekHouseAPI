@@ -18,7 +18,7 @@ namespace GeeekHouseAPI.Data
         public Availability Availability { get; set; }
         public Category Category { get; set; }
 
-        public ICollection<Subcategory>  Subcategories { get; set;}
+        public Subcategory Subcategory { get; set;}
         public DateTime insertDate { get; set; } = DateTime.Now;
     }
 

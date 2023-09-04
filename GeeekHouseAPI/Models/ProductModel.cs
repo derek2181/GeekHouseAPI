@@ -26,6 +26,6 @@ namespace GeeekHouseAPI
         public ICollection<ImageModel> Images { get; set; }
         public CategoryModel Category { get; set; }
 
-        public ICollection<CategoryModel> Subcategories { get; set; }
+        public CategoryModel Subcategory { get; set; }
     }
 }

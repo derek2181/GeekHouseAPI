@@ -112,16 +112,16 @@ namespace GeeekHouseAPI.Repository
             return product;
         }
 
-        public async Task<int> AddProduct(ProductModel productModel,int categoryId,int[] subcategoriesList,int availabilityType)
+        public async Task<int> AddProduct(ProductModel productModel,int categoryId,int subcategoryId, int availabilityType)
         {
             var category = await context.Category.Where(c => c.Id==categoryId).FirstOrDefaultAsync();
-            var subcategories = await context.Subcategory.Where(c => subcategoriesList.Contains(c.Id)).ToListAsync();
+            var subcategory = await context.Subcategory.Where(c => c.Id== subcategoryId).FirstOrDefaultAsync();
             var availability = await context.Availability.Where(a => a.Id == availabilityType).FirstOrDefaultAsync();
             var product = new Product()
             {
                 Name = productModel.Name,
                 Category = category,
-                Subcategories=subcategories,
+                Subcategory= subcategory,
                 Image =productModel.Images != null ? productModel.Images.ToList().Select(i => new Image
                 {
                 Id=i.Id,
@@ -173,7 +173,7 @@ namespace GeeekHouseAPI.Repository
 
             if (categoryFilter!=null)
             {
-                query = query.Where(p => p.Category.Id == categoryType.Id && p.Subcategories.Any(c => c.Id== categoryFilter.Id));
+                query = query.Where(p => p.Category.Id == categoryType.Id && p.Subcategory.Id == categoryFilter.Id);
             }
             else if(categoryType!=null)
             {
@@ -274,7 +274,7 @@ namespace GeeekHouseAPI.Repository
         {
             //TODO: Ver como mapear las categorias, ver como hacer que no truene y hacer el query bien
 
-            var data = await context.Product.Where(p => p.Subcategories.Any(c => c.Id == category)).Select(p=>new ProductModel()
+            var data = await context.Product.Where(p => p.Subcategory.Id==category).Select(p=>new ProductModel()
             {
                 Id=p.Id,
                 Name=p.Name
