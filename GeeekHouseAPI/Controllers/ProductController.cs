@@ -103,6 +103,7 @@ namespace GeeekHouseAPI.Controllers
 
         }
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] int category, [FromForm]  int subcategory,[FromForm] int availability)
         {
             try
