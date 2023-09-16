@@ -7,6 +7,7 @@ using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
 using GeeekHouseAPI.Services;
 using GeeekHouseAPI.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -103,6 +104,7 @@ namespace GeeekHouseAPI.Controllers
 
         }
         [HttpPost]
+        [Authorize]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] int category, [FromForm]  int subcategory,[FromForm] int availability)
         {
