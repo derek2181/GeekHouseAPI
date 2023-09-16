@@ -81,7 +81,12 @@ namespace GeeekHouseAPI
                
             }
            
-            app.UseCors(config => config.AllowAnyOrigin());
+            app.UseCors(config => {
+                config.AllowAnyOrigin();
+                config.AllowAnyMethod();
+                config.AllowAnyHeader();
+                
+            });
             app.UseHttpsRedirection();
 
             app.UseRouting();
