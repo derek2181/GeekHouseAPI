@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GeeekHouseAPI.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GeeekHouseAPI.Data
 {
-    public class GeekHouseContext : DbContext
+    public class GeekHouseContext : IdentityDbContext<ApplicationUser>
     {
         public GeekHouseContext(DbContextOptions<GeekHouseContext> options) : base(options)
         {
