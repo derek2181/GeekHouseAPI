@@ -104,17 +104,15 @@ namespace GeeekHouseAPI.Controllers
 
         }
         [HttpPost]
-        [Authorize]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product, [FromForm] int category, [FromForm]  int subcategory,[FromForm] int availability)
+        public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product,[FromForm] ICollection<IFormFile?> imageFiles, [FromForm]  int category, [FromForm]  int subcategory,[FromForm] int availability)
         {
             try
             {
                 var result = new S3ResponseDTO();
-                if(product.ImageFiles != null)
+                if(imageFiles.Count>0)
                 {
                     product.Images = new Collection<ImageModel>();
-                    foreach(IFormFile file in product.ImageFiles)
+                    foreach(IFormFile file in imageFiles)
                     {
                       // ImageModel image = await ImageUploader.Upload("products", file);
 
@@ -151,16 +149,17 @@ namespace GeeekHouseAPI.Controllers
                         product.Images.Add(image);
 
                     }
+                    var id = await _productRepository.AddProduct(product, category, subcategory, availability);
+                    return Ok(new{ message="SUCCESS",code=201});
                 }
 
 
-                var id= await _productRepository.AddProduct(product,category, subcategory, availability);
-                return Created("images/" + result, "SUCCESS");
+                return BadRequest(new { message = "ERROR", code = 400 });
 
             }
             catch (Exception e)
             {
-                return BadRequest(e.Message);
+                return BadRequest(new { message = e.Message, code = 400 });
             }
             
         }
