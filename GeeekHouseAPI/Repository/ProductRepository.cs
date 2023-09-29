@@ -111,7 +111,7 @@ namespace GeeekHouseAPI.Repository
             product.Images = images;
             return product;
         }
-
+        
         public async Task<int> AddProduct(ProductModel productModel,int categoryId,int subcategoryId, int availabilityType)
         {
             var category = await context.Category.Where(c => c.Id==categoryId).FirstOrDefaultAsync();
@@ -124,7 +124,6 @@ namespace GeeekHouseAPI.Repository
                 Subcategory= subcategory,
                 Image =productModel.Images != null ? productModel.Images.ToList().Select(i => new Image
                 {
-                Id=i.Id,
                 Mime=i.Mime,
                 Name=i.Name,
                 Path=i.Path,
@@ -321,6 +320,62 @@ namespace GeeekHouseAPI.Repository
             }).ToListAsync();
 
             return products;
+        }
+
+        public async Task<int> EditProduct(ProductModel productModel, int category, int subcategoryId, int availability)
+        {
+            var productEntity=await context.Product.Where(product=>product.Id==productModel.Id).FirstOrDefaultAsync();
+
+            if (productEntity!=null)
+            {
+                var productName = await context.Product.Where(p => p.Name.Equals(productModel.Name) && !p.Id.Equals(productModel.Id)).FirstOrDefaultAsync();
+
+                if (productName != null)
+                {
+                    return 400;//"El producto con el nombre" + productModel.Name + " ya existe.";
+                }
+                productEntity.Name = productModel.Name;
+                productEntity.Price = productModel.Price;
+                productEntity.Description = productModel.Description;
+                productEntity.Stock= productModel.Stock;  
+                productEntity.Availability= await context.Availability.Where(av=>av.Id==availability).FirstOrDefaultAsync(); 
+                productEntity.Subcategory=await context.Subcategory.Where(s=>s.Id.Equals(subcategoryId)).FirstOrDefaultAsync();
+                productEntity.Category=await context.Category.Where(c=>c.Id.Equals(category)).FirstOrDefaultAsync();
+
+                if(productModel.Images.Count>0)
+                {
+                    foreach(var imageModel in productModel.Images)
+                    {
+                        Image imageEntity = null;
+                        if (imageModel.Id != 0)
+                        {
+                            imageEntity=await context.Image.Where(image=>image.Id==imageModel.Id).FirstOrDefaultAsync();
+
+                            imageEntity.objectName= imageModel.objectName;
+                            imageEntity.Name= imageModel.Name;
+                            imageEntity.Path= imageModel.Path;
+                            imageEntity.Mime= imageModel.Mime;
+
+                        }
+                        else
+                        {
+                            imageEntity = new Image
+                            {
+                                Mime = imageModel.Mime,
+                                Name = imageModel.Name,
+                                Path = imageModel.Path,
+                                objectName = imageModel.objectName,
+                                product=productEntity
+                            };
+                            context.Image.Add(imageEntity);
+                        }
+                       
+                    }
+                }
+                await context.SaveChangesAsync();
+                return 200;
+            }
+            return 404;
         }
     }
 }

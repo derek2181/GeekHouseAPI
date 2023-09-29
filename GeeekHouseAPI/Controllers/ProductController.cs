@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
@@ -102,6 +103,69 @@ namespace GeeekHouseAPI.Controllers
                 return BadRequest(e.Message);
             }
 
+        }
+        [HttpPut]
+        public async Task<IActionResult> EditProduct([FromForm] ProductModel product, [FromForm] ICollection<EditImageModel> imageFiles, [FromForm] int category, [FromForm] int subcategory, [FromForm] int availability)
+        {
+            try
+            {
+                var result = new S3ResponseDTO();
+
+                var imagesToAdd = imageFiles.Where(image=>image.file!=null).ToList();
+
+                product.Images=new Collection<ImageModel>();
+
+                    foreach (EditImageModel imageModel in imagesToAdd)
+                    {
+                        // ImageModel image = await ImageUploader.Upload("products", file);
+
+                        await using var memoryStream = new MemoryStream();
+                        await imageModel.file.CopyToAsync(memoryStream);
+                    
+                        var fileExt = Path.GetExtension(imageModel.file.FileName);
+                        var objName = $"{Guid.NewGuid()}{fileExt}";
+
+                        var s3Obj = new S3Object()
+                        {
+                            BucketName = "geekhouse-bucket",
+                            InputStream = memoryStream,
+                            Name = objName
+
+                        };
+
+                        var cred = new AWSCredentials()
+                        {
+                            AwsKey = _configuration["AWSConfig:AWSAccessKey"],
+                            AwsSecretKey = _configuration["AWSConfig:AWSSecretKey"]
+                        };
+
+                        result = await _storageService.UploadFileAsync(s3Obj, cred);
+
+                        var image = new ImageModel()
+                        {
+                            Name = imageModel.file.FileName,
+                            Mime = imageModel.file.ContentType,
+                            Path = _configuration["AWSConfig:S3BucketURL"] + objName,
+                            objectName = objName,
+                            Id= imageModel.id
+                        };
+                        product.Images.Add(image);
+
+                    }
+                    var code = await _productRepository.EditProduct(product, category, subcategory, availability);
+
+                if(code.Equals(200))
+                    return Ok(new {message="Se ha actualizado el producto con exito",code});
+                if (code.Equals(404))
+                    return NotFound(new { message = "No se encontró el producto con nombre: " + product.Name, code });
+
+                return BadRequest(new { message = "No se puede crear un producto con nombre ya existente: " + product.Name, code });
+
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { message = "ERROR", code = 400 });
+            }
         }
         [HttpPost]
         public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product,[FromForm] ICollection<IFormFile?> imageFiles, [FromForm]  int category, [FromForm]  int subcategory,[FromForm] int availability)
