@@ -96,7 +96,7 @@ namespace GeeekHouseAPI.Repository
                 Price =p.Price,
                 Description = p.Description,
                 Stock = p.Stock,
-               
+                Subcategory=new CategoryModel {Id=p.Subcategory.Id,Name=p.Subcategory.Name }
             }).Where(p => p.Name == name).SingleOrDefaultAsync();
 
             var images = await context.Image.Where(i => i.product.Id == product.Id).Select(i => new ImageModel
