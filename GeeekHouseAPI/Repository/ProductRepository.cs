@@ -24,7 +24,7 @@ namespace GeeekHouseAPI.Repository
         public async Task<List<ProductModel>> GetRelatedProductsByCategory(int category,int productId)
         {
 
-            var data = await context.Product.Where(p => p.Category.Id==category && p.Id!= productId)
+            var data = await context.Product.Where(p => p.Category.Id==category && p.Id!= productId && p.isActive)
               .Select(p => new ProductModel
               {
 
@@ -54,7 +54,7 @@ namespace GeeekHouseAPI.Repository
         }
         public async Task<List<ProductModel>> GetRecentFunkoPops()
         {
-            var data = await context.Product.Where(p=>p.Availability.Id==1 && p.Category.Id==1).Select(p => new ProductModel()
+            var data = await context.Product.Where(p=>p.Availability.Id==1 && p.Category.Id==1 && p.isActive).Select(p => new ProductModel()
             {
                 Id= p.Id,
                 Name=p.Name,
@@ -112,8 +112,9 @@ namespace GeeekHouseAPI.Repository
             return product;
         }
         
-        public async Task<int> AddProduct(ProductModel productModel,int categoryId,int subcategoryId, int availabilityType)
+        public async Task<GenericResponse> AddProduct(ProductModel productModel,int categoryId,int subcategoryId, int availabilityType)
         {
+            var response = new GenericResponse();
             var category = await context.Category.Where(c => c.Id==categoryId).FirstOrDefaultAsync();
             var subcategory = await context.Subcategory.Where(c => c.Id== subcategoryId).FirstOrDefaultAsync();
             var availability = await context.Availability.Where(a => a.Id == availabilityType).FirstOrDefaultAsync();
@@ -140,17 +141,19 @@ namespace GeeekHouseAPI.Repository
             {
                 context.Product.Add(product);
                 await context.SaveChangesAsync();
-
-
             }
             catch (Exception e)
             {
-                return -1;
+                response.code = 400;
+                response.message = "Hubo un problema al agregar el producto";
+                return response;
             }
 
+            response.code = 200;
+            response.message = "Se ha añadido el producto con éxito";
 
-            
-            return product.Id;
+
+            return response;
 
         }
         public async Task<SearchModel> GetProductsAdvancedSearch(string category,string searchText,string subcategory,
@@ -169,7 +172,7 @@ namespace GeeekHouseAPI.Repository
             }).FirstOrDefaultAsync();
 
             var query = context.Product.AsQueryable();
-
+            query = query.Where(p => p.isActive);
             if (categoryFilter!=null)
             {
                 query = query.Where(p => p.Category.Id == categoryType.Id && p.Subcategory.Id == categoryFilter.Id);
@@ -316,23 +319,27 @@ namespace GeeekHouseAPI.Repository
                     Mime = i.Mime,
                     Name = i.Name,
                     Path = i.Path
-                }).FirstOrDefault() : null
+                }).FirstOrDefault() : null,
+                isActive=p.isActive
             }).ToListAsync();
 
             return products;
         }
 
-        public async Task<int> EditProduct(ProductModel productModel, int category, int subcategoryId, int availability)
+        public async Task<GenericResponse> EditProduct(ProductModel productModel, int category, int subcategoryId, int availability)
         {
             var productEntity=await context.Product.Where(product=>product.Id==productModel.Id).FirstOrDefaultAsync();
-
+            var response = new GenericResponse();
             if (productEntity!=null)
             {
                 var productName = await context.Product.Where(p => p.Name.Equals(productModel.Name) && !p.Id.Equals(productModel.Id)).FirstOrDefaultAsync();
 
                 if (productName != null)
                 {
-                    return 400;//"El producto con el nombre" + productModel.Name + " ya existe.";
+                    response.code = 400;
+                    response.message = "No se puede crear un producto con nombre ya existente: " + productModel.Name;
+                
+                    return response;//"El producto con el nombre" + productModel.Name + " ya existe.";
                 }
                 productEntity.Name = productModel.Name;
                 productEntity.Price = productModel.Price;
@@ -373,9 +380,31 @@ namespace GeeekHouseAPI.Repository
                     }
                 }
                 await context.SaveChangesAsync();
-                return 200;
+                response.code = 200;
+                response.message = "Se ha actualizado el producto con exito";
+                return response;
             }
-            return 404;
+            response.code = 404;
+            response.message = "No se encontró el producto con nombre: " + productModel.Name;
+            return response;
+        }
+
+        public async Task<GenericResponse> DisableProduct(int productId)
+        {
+            var response = new GenericResponse();
+
+            var product = await context.Product.Where(p => p.Id.Equals(productId)).FirstOrDefaultAsync();
+            if(product != null)
+            {
+                product.isActive = !product.isActive;
+                await context.SaveChangesAsync();
+                response.code = 200;
+                response.message = "Se ha modificado el producto";
+                return response;
+            }
+            response.code = 404;
+            response.message = "No se pudo encontrar el producto";
+            return response;
         }
     }
 }

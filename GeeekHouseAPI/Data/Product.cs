@@ -20,6 +20,8 @@ namespace GeeekHouseAPI.Data
 
         public Subcategory Subcategory { get; set;}
         public DateTime insertDate { get; set; } = DateTime.Now;
+
+        public bool isActive { get; set; }
     }
 
 }

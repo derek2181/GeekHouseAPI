@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GeeekHouseAPI.Data;
 using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
 using GeeekHouseAPI.Services;
@@ -152,14 +153,14 @@ namespace GeeekHouseAPI.Controllers
                         product.Images.Add(image);
 
                     }
-                    var code = await _productRepository.EditProduct(product, category, subcategory, availability);
+                    var response = await _productRepository.EditProduct(product, category, subcategory, availability);
 
-                if(code.Equals(200))
-                    return Ok(new {message="Se ha actualizado el producto con exito",code});
-                if (code.Equals(404))
-                    return NotFound(new { message = "No se encontró el producto con nombre: " + product.Name, code });
+                if(response.code.Equals(200))
+                    return Ok(response);
+                if (response.code.Equals(404))
+                    return NotFound(response);
 
-                return BadRequest(new { message = "No se puede crear un producto con nombre ya existente: " + product.Name, code });
+                return BadRequest(response);
 
             }
             catch (Exception e)
@@ -172,6 +173,7 @@ namespace GeeekHouseAPI.Controllers
         {
             try
             {
+                var response = new GenericResponse();
                 var result = new S3ResponseDTO();
                 if(imageFiles.Count>0)
                 {
@@ -213,12 +215,13 @@ namespace GeeekHouseAPI.Controllers
                         product.Images.Add(image);
 
                     }
-                    var id = await _productRepository.AddProduct(product, category, subcategory, availability);
-                    return Ok(new{ message="SUCCESS",code=201});
+                    response = await _productRepository.AddProduct(product, category, subcategory, availability);
+                    return Ok(response);
                 }
 
-
-                return BadRequest(new { message = "ERROR", code = 400 });
+                response.code = 400;
+                response.message = "Hubo un error al agregar el producto";
+                return BadRequest(response);
 
             }
             catch (Exception e)
@@ -276,6 +279,18 @@ namespace GeeekHouseAPI.Controllers
                 
                 return Ok(await _productRepository.GetProductsAdvancedSearch(category, searchText, subcategory, orderBy,pageSize,pageIndex));
             }catch(Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+        [HttpPut("disable")]
+        public async Task<IActionResult> DisableProduct([FromForm] int productId)
+        {
+            try
+            {
+                return Ok(await _productRepository.DisableProduct(productId));
+            }
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }

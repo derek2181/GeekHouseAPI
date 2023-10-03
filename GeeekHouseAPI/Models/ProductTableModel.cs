@@ -17,5 +17,7 @@ namespace GeeekHouseAPI.Models
 
         public string Category { get; set; }
 
+        public bool isActive { get; set; }
+
     }
 }
