@@ -10,6 +10,6 @@ namespace GeeekHouseAPI.Repository
     public interface IAccountRepository
     {
         Task<IdentityResult> SignUpAsync(SignUpModel signUpModel);
-        Task<string> LoginAsync(SignInModel signInModel);
+        Task<object> LoginAsync(SignInModel signInModel);
     }
 }

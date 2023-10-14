@@ -105,6 +105,7 @@ namespace GeeekHouseAPI.Controllers
             }
 
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         public async Task<IActionResult> EditProduct([FromForm] ProductModel product, [FromForm] ICollection<EditImageModel> imageFiles, [FromForm] int category, [FromForm] int subcategory, [FromForm] int availability)
         {
@@ -168,12 +169,13 @@ namespace GeeekHouseAPI.Controllers
                 return BadRequest(new { message = "ERROR", code = 400 });
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddNewProduct([FromForm] ProductModel product,[FromForm] ICollection<IFormFile?> imageFiles, [FromForm]  int category, [FromForm]  int subcategory,[FromForm] int availability)
         {
             try
             {
-                var response = new GenericResponse();
+                var response = new GenericResponse<string>();
                 var result = new S3ResponseDTO();
                 if(imageFiles.Count>0)
                 {
@@ -283,6 +285,7 @@ namespace GeeekHouseAPI.Controllers
                 return BadRequest(e.Message);
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("disable")]
         public async Task<IActionResult> DisableProduct([FromForm] int productId)
         {
