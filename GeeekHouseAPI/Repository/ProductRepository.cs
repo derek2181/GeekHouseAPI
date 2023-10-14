@@ -52,9 +52,10 @@ namespace GeeekHouseAPI.Repository
 
             return data;
         }
-        public async Task<List<ProductModel>> GetRecentFunkoPops()
+        public async Task<LandingModel> GetRecentFunkoPops()
         {
-            var data = await context.Product.Where(p=>p.Availability.Id==1 && p.Category.Id==1 && p.isActive).Select(p => new ProductModel()
+            var response = new LandingModel();
+            var newFunkoStock = await context.Product.Where(p=>p.Availability.Id==1 && p.Category.Id==1 && p.isActive).Select(p => new ProductModel()
             {
                 Id= p.Id,
                 Name=p.Name,
@@ -73,10 +74,57 @@ namespace GeeekHouseAPI.Repository
                 Price=p.Price,
                 Path= p.Name.Replace(' ','-'),
                 Description=p.Description,
-                Stock=p.Stock
+                Stock=p.Stock,
+                Category=p.Category !=null ? new CategoryModel
+                {
+                    Id = p.Category.Id,
+                    Name=p.Category.Name,
+                }: null,
+                Subcategory = p.Category != null ? new CategoryModel
+                {
+                    Id = p.Subcategory.Id,
+                    Name = p.Subcategory.Name,
+                } : null
 
             }).Take(8).ToListAsync();
-            return data;
+
+            var newFunkoPreorder = await context.Product.Where(p => p.Availability.Id ==2  && p.Category.Id == 1 && p.isActive).Select(p => new ProductModel()
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Image = p.Image != null ? p.Image.Select(i => new ImageModel
+                {
+                    Id = i.Id,
+                    Mime = i.Mime,
+                    Name = i.Name,
+                    Path = i.Path
+                }).FirstOrDefault() : null,
+                Availability = p.Availability != null ? new AvailabilityModel
+                {
+                    Description = p.Availability.Description,
+                    Id = p.Availability.Id
+                } : null,
+                Price = p.Price,
+                Path = p.Name.Replace(' ', '-'),
+                Description = p.Description,
+                Stock = p.Stock,
+                Category = p.Category != null ? new CategoryModel
+                {
+                    Id = p.Category.Id,
+                    Name = p.Category.Name,
+                } : null,
+                Subcategory = p.Category != null ? new CategoryModel
+                {
+                    Id = p.Subcategory.Id,
+                    Name = p.Subcategory.Name,
+                } : null
+
+            }).Take(8).ToListAsync();
+
+
+            response.newPreorders = newFunkoPreorder;
+            response.newStock = newFunkoStock;
+            return response;
 
         }
 

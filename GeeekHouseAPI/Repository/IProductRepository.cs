@@ -6,7 +6,7 @@ namespace GeeekHouseAPI.Repository
 {
     public interface IProductRepository
     {
-        Task<List<ProductModel>> GetRecentFunkoPops();
+        Task<LandingModel> GetRecentFunkoPops();
         Task<ProductModel> GetProductByName(string id);
         Task<GenericResponse<string>> AddProduct(ProductModel productModel,int cateogory, int subcategoryId, int availability);
 
