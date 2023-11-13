@@ -45,7 +45,17 @@ namespace GeeekHouseAPI.Repository
                   Price = p.Price,
                   Path = p.Name.Replace(' ', '-'),
                   Description = p.Description,
-                  Stock = p.Stock
+                  Stock = p.Stock,
+                  Category = p.Category != null ? new CategoryModel
+                  {
+                      Id = p.Category.Id,
+                      Name = p.Category.Name,
+                  } : null,
+                  Subcategory = p.Category != null ? new CategoryModel
+                  {
+                      Id = p.Subcategory.Id,
+                      Name = p.Subcategory.Name,
+                  } : null
               }
               ).Take(8).ToListAsync();
 
@@ -285,7 +295,17 @@ namespace GeeekHouseAPI.Repository
                 Price = p.Price,
                 Path = p.Name.Replace(' ', '-'),
                 Description = p.Description,
-                Stock = p.Stock
+                Stock = p.Stock,
+                Category = p.Category != null ? new CategoryModel
+                {
+                    Id = p.Category.Id,
+                    Name = p.Category.Name,
+                } : null,
+                Subcategory = p.Category != null ? new CategoryModel
+                {
+                    Id = p.Subcategory.Id,
+                    Name = p.Subcategory.Name,
+                } : null
             }).Skip(pageSize*pageIndex).Take(pageSize).ToListAsync();
 
             SearchModel advancedSearchModel = new SearchModel { products = products, count = query.Count() };
