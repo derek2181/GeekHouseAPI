@@ -9,5 +9,6 @@ namespace GeeekHouseAPI.Services
     public interface IStorageService
     {
         Task<S3ResponseDTO> UploadFileAsync(S3Object s3Object,AWSCredentials credentials);
+        Task<S3ResponseDTO> DeleteFileIfExists(string src, Models.AWSCredentials credentials);
     }
 }
