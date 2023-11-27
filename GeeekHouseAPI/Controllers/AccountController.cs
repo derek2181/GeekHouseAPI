@@ -1,5 +1,6 @@
 ﻿using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -35,12 +36,22 @@ namespace GeeekHouseAPI.Controllers
         public async Task<IActionResult> Login([FromBody] SignInModel signInModel)
         {
             var result = await _accountRepository.LoginAsync(signInModel);
-            if (string.IsNullOrEmpty(result))
+            if (result == null)
             {
-                return Unauthorized();
+                return Unauthorized(new GenericResponse<object>() {
+                    code=403,
+                    message="Usuario o contraseña incorrectos."
+                });
             }
 
-            return Ok(result);
+            var genericResponse = new GenericResponse<object>()
+            {
+                code = 200,
+                message = "The login was successfull",
+                data = result
+            };
+
+            return Ok(genericResponse);
         }
     }
 }

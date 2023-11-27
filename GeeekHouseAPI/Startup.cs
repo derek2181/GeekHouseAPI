@@ -2,6 +2,7 @@ using GeeekHouseAPI.Data;
 using GeeekHouseAPI.Models;
 using GeeekHouseAPI.Repository;
 using GeeekHouseAPI.Services;
+using GeeekHouseAPI.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -73,32 +74,85 @@ namespace GeeekHouseAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
+         
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                
             }
-           
+
             app.UseCors(config => {
                 config.AllowAnyOrigin();
                 config.AllowAnyMethod();
                 config.AllowAnyHeader();
-                
+
             });
+
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
+            CreateUserRoles(services).Wait();
+
+        }
+
+        public async Task CreateUserRoles(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            string[] roleNames = {"Admin"};
+            IdentityResult roleResult;
+            foreach (var roleName in roleNames)
+            {
+                var roleCheck = await roleManager.RoleExistsAsync(roleName);
+                if (!roleCheck)
+                {
+                    roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
+
+                }
+
+            }
+
+            string email = Configuration["AppSettings:UserEmail"];
+            string userPassword = Configuration["AppSettings:UserPassword"];
+            string firstName = Configuration["AppSettings:FirstName"];
+            string lastName = Configuration["AppSettings:LastName"];
+
+            ApplicationUser usuario = await userManager.FindByEmailAsync(email);
+
+            if (usuario == null)
+            {
+                usuario = new ApplicationUser()
+                {
+                    UserName = email,
+                    Email = email,
+                    FirstName = firstName,
+                    LastName = lastName
+                };
+                await userManager.CreateAsync(usuario, userPassword);
+            }
+
+            if (!await userManager.IsInRoleAsync(usuario, "Admin"))
+            {
+                await userManager.AddToRoleAsync(usuario, "Admin");
+            }
+
+
         }
     }
+
 }
+

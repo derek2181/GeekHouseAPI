@@ -38,7 +38,7 @@ namespace GeeekHouseAPI.Repository
             return await userManager.CreateAsync(user, signUpModel.Password);
         }
 
-        public async Task<string> LoginAsync(SignInModel signInModel)
+        public async Task<object> LoginAsync(SignInModel signInModel)
         {
             var result = await signInManager.PasswordSignInAsync(signInModel.Email, signInModel.Password, false, false);
 
@@ -53,6 +53,15 @@ namespace GeeekHouseAPI.Repository
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            //Search user roles
+            var user = await userManager.FindByEmailAsync(signInModel.Email);
+
+            if (await userManager.IsInRoleAsync(user, "Admin"))
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            }
+
+
             var authSigninKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JWT:Secret"]));
 
             var token = new JwtSecurityToken(
@@ -63,7 +72,10 @@ namespace GeeekHouseAPI.Repository
                 signingCredentials: new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256Signature)
                 );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new { 
+                token= new JwtSecurityTokenHandler().WriteToken(token),
+                role="Admin"
+            };
         }
     }
 }

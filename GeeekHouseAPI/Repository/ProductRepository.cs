@@ -48,13 +48,12 @@ namespace GeeekHouseAPI.Repository
                   Stock = p.Stock,
                   Category = p.Category != null ? new CategoryModel
                   {
-                      Id = p.Category.Id,
-                      Name = p.Category.Name,
+
+                      Name = p.Category.Name
                   } : null,
-                  Subcategory = p.Category != null ? new CategoryModel
+                  Subcategory = p.Subcategory != null ? new CategoryModel
                   {
-                      Id = p.Subcategory.Id,
-                      Name = p.Subcategory.Name,
+                      Name = p.Subcategory.Name
                   } : null
               }
               ).Take(8).ToListAsync();
@@ -170,9 +169,9 @@ namespace GeeekHouseAPI.Repository
             return product;
         }
         
-        public async Task<GenericResponse> AddProduct(ProductModel productModel,int categoryId,int subcategoryId, int availabilityType)
+        public async Task<GenericResponse<string>> AddProduct(ProductModel productModel,int categoryId,int subcategoryId, int availabilityType)
         {
-            var response = new GenericResponse();
+            var response = new GenericResponse<string>();
             var category = await context.Category.Where(c => c.Id==categoryId).FirstOrDefaultAsync();
             var subcategory = await context.Subcategory.Where(c => c.Id== subcategoryId).FirstOrDefaultAsync();
             var availability = await context.Availability.Where(a => a.Id == availabilityType).FirstOrDefaultAsync();
@@ -296,16 +295,14 @@ namespace GeeekHouseAPI.Repository
                 Path = p.Name.Replace(' ', '-'),
                 Description = p.Description,
                 Stock = p.Stock,
-                Category = p.Category != null ? new CategoryModel
+
+                Category = p.Category != null ? new CategoryModel{ 
+                    Name = p.Category.Name
+                }: null,
+                Subcategory = p.Subcategory != null ? new CategoryModel
                 {
-                    Id = p.Category.Id,
-                    Name = p.Category.Name,
-                } : null,
-                Subcategory = p.Category != null ? new CategoryModel
-                {
-                    Id = p.Subcategory.Id,
-                    Name = p.Subcategory.Name,
-                } : null
+                    Name = p.Subcategory.Name
+                }: null
             }).Skip(pageSize*pageIndex).Take(pageSize).ToListAsync();
 
             SearchModel advancedSearchModel = new SearchModel { products = products, count = query.Count() };
@@ -394,10 +391,10 @@ namespace GeeekHouseAPI.Repository
             return products;
         }
 
-        public async Task<GenericResponse> EditProduct(ProductModel productModel, int category, int subcategoryId, int availability)
+        public async Task<GenericResponse<string>> EditProduct(ProductModel productModel, int category, int subcategoryId, int availability)
         {
             var productEntity=await context.Product.Where(product=>product.Id==productModel.Id).FirstOrDefaultAsync();
-            var response = new GenericResponse();
+            var response = new GenericResponse<string>();
             if (productEntity!=null)
             {
                 var productName = await context.Product.Where(p => p.Name.Equals(productModel.Name) && !p.Id.Equals(productModel.Id)).FirstOrDefaultAsync();
@@ -457,9 +454,9 @@ namespace GeeekHouseAPI.Repository
             return response;
         }
 
-        public async Task<GenericResponse> DisableProduct(int productId)
+        public async Task<GenericResponse<string>> DisableProduct(int productId)
         {
-            var response = new GenericResponse();
+            var response = new GenericResponse<string>();
 
             var product = await context.Product.Where(p => p.Id.Equals(productId)).FirstOrDefaultAsync();
             if(product != null)

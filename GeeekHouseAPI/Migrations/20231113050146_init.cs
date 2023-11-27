@@ -213,7 +213,8 @@ namespace GeeekHouseAPI.Migrations
                     AvailabilityId = table.Column<int>(type: "int", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
                     SubcategoryId = table.Column<int>(type: "int", nullable: true),
-                    insertDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    insertDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    isActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
