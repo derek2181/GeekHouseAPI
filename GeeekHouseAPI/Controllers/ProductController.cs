@@ -21,17 +21,20 @@ namespace GeeekHouseAPI.Controllers
       public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
+        private readonly IImageRepository _imageRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IStorageService _storageService;
         private readonly IConfiguration _configuration;
-        public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment,
+        public ProductController(IProductRepository productRepository, IImageRepository imageRepository, IWebHostEnvironment webHostEnvironment,
             IStorageService storageService, IConfiguration configuration)
         {
             _productRepository = productRepository;
+            _imageRepository = imageRepository;
             _webHostEnvironment = webHostEnvironment;
             _storageService=storageService;
             this._configuration = configuration;
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("admin")]
         public async Task<IActionResult> GetAllProductsAdmin()
         {
@@ -141,6 +144,11 @@ namespace GeeekHouseAPI.Controllers
                             AwsSecretKey = _configuration["AWSConfig:AWSSecretKey"]
                         };
 
+
+                        //SEARCH IMAGE
+                        var imageFromDB = await _imageRepository.GetImageById(imageModel.id);
+                        
+                        await _storageService.DeleteFileIfExists(imageFromDB != null ? imageFromDB.Path : "", cred);
                         result = await _storageService.UploadFileAsync(s3Obj, cred);
 
                         var image = new ImageModel()
