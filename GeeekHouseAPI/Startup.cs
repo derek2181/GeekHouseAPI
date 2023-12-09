@@ -93,7 +93,7 @@ namespace GeeekHouseAPI
             });
 
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
