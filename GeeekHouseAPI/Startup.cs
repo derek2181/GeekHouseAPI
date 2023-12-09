@@ -63,8 +63,9 @@ namespace GeeekHouseAPI
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
             });
+            var connectionString = Configuration.GetConnectionString("GeekHouseDB");
             services.AddDbContext<GeekHouseContext>(
-                options=>options.UseSqlServer(Configuration.GetConnectionString("GeekHouseDB")));
+                options=>options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddTransient<IImageRepository, ImageRepository>();

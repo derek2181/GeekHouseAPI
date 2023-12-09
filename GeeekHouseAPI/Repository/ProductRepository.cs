@@ -179,20 +179,21 @@ namespace GeeekHouseAPI.Repository
             {
                 Name = productModel.Name,
                 Category = category,
-                Subcategory= subcategory,
-                Image =productModel.Images != null ? productModel.Images.ToList().Select(i => new Image
+                Subcategory = subcategory,
+                Image = productModel.Images != null ? productModel.Images.ToList().Select(i => new Image
                 {
-                Mime=i.Mime,
-                Name=i.Name,
-                Path=i.Path,
-                objectName=i.objectName
+                    Mime = i.Mime,
+                    Name = i.Name,
+                    Path = i.Path,
+                    objectName = i.objectName
                 }).ToList() : null
                 ,
-                Description=productModel.Description,
+                Description = productModel.Description,
                 Availability = availability,
-                Price=productModel.Price,
-                Stock=productModel.Stock,
-                insertDate=DateTime.Now,
+                Price = productModel.Price,
+                Stock = productModel.Stock,
+                insertDate = DateTime.Now,
+                isActive = true
             };
             try
             {
