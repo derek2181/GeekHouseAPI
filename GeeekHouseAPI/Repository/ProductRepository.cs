@@ -43,6 +43,7 @@ namespace GeeekHouseAPI.Repository
                       Id = p.Availability.Id
                   } : null,
                   Price = p.Price,
+                  DiscountPrice= p.DiscountPrice,
                   Path = p.Name.Replace(' ', '-'),
                   Description = p.Description,
                   Stock = p.Stock,
@@ -81,7 +82,8 @@ namespace GeeekHouseAPI.Repository
                     Id = p.Availability.Id
                 } : null,
                 Price=p.Price,
-                Path= p.Name.Replace(' ','-'),
+                DiscountPrice = p.DiscountPrice,
+                Path = p.Name.Replace(' ','-'),
                 Description=p.Description,
                 Stock=p.Stock,
                 Category=p.Category !=null ? new CategoryModel
@@ -114,6 +116,7 @@ namespace GeeekHouseAPI.Repository
                     Id = p.Availability.Id
                 } : null,
                 Price = p.Price,
+                DiscountPrice=p.DiscountPrice,
                 Path = p.Name.Replace(' ', '-'),
                 Description = p.Description,
                 Stock = p.Stock,
@@ -130,9 +133,43 @@ namespace GeeekHouseAPI.Repository
 
             }).Take(8).ToListAsync();
 
+            var newDiscount = await context.Product.Where(p => p.DiscountPrice!=0 && p.Category.Id == 1 && p.isActive).Select(p => new ProductModel()
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Image = p.Image != null ? p.Image.Select(i => new ImageModel
+                {
+                    Id = i.Id,
+                    Mime = i.Mime,
+                    Name = i.Name,
+                    Path = i.Path
+                }).FirstOrDefault() : null,
+                Availability = p.Availability != null ? new AvailabilityModel
+                {
+                    Description = p.Availability.Description,
+                    Id = p.Availability.Id
+                } : null,
+                Price = p.Price,
+                DiscountPrice = p.DiscountPrice,
+                Path = p.Name.Replace(' ', '-'),
+                Description = p.Description,
+                Stock = p.Stock,
+                Category = p.Category != null ? new CategoryModel
+                {
+                    Id = p.Category.Id,
+                    Name = p.Category.Name,
+                } : null,
+                Subcategory = p.Category != null ? new CategoryModel
+                {
+                    Id = p.Subcategory.Id,
+                    Name = p.Subcategory.Name,
+                } : null
+
+            }).Take(8).ToListAsync();
 
             response.newPreorders = newFunkoPreorder;
             response.newStock = newFunkoStock;
+            response.newDiscount = newDiscount;
             return response;
 
         }
@@ -151,6 +188,7 @@ namespace GeeekHouseAPI.Repository
                 }:null,
                 Category = new CategoryModel { Id = p.Category.Id, Name = p.Category.Name },
                 Price =p.Price,
+                DiscountPrice = p.DiscountPrice,
                 Description = p.Description,
                 Stock = p.Stock,
                 Subcategory=new CategoryModel {Id=p.Subcategory.Id,Name=p.Subcategory.Name }
@@ -191,6 +229,7 @@ namespace GeeekHouseAPI.Repository
                 Description = productModel.Description,
                 Availability = availability,
                 Price = productModel.Price,
+                DiscountPrice = productModel.DiscountPrice,
                 Stock = productModel.Stock,
                 insertDate = DateTime.Now,
                 isActive = true
@@ -293,6 +332,7 @@ namespace GeeekHouseAPI.Repository
                     Id = p.Availability.Id
                 } : null,
                 Price = p.Price,
+                DiscountPrice = p.DiscountPrice,
                 Path = p.Name.Replace(' ', '-'),
                 Description = p.Description,
                 Stock = p.Stock,
@@ -409,6 +449,7 @@ namespace GeeekHouseAPI.Repository
                 }
                 productEntity.Name = productModel.Name;
                 productEntity.Price = productModel.Price;
+                productEntity.DiscountPrice = productModel.DiscountPrice;
                 productEntity.Description = productModel.Description;
                 productEntity.Stock= productModel.Stock;  
                 productEntity.Availability= await context.Availability.Where(av=>av.Id==availability).FirstOrDefaultAsync(); 

@@ -6,5 +6,7 @@ namespace GeeekHouseAPI.Models
     {
         public List<ProductModel> newStock{ get; set; }
         public List<ProductModel> newPreorders { get; set; }
+
+        public List<ProductModel> newDiscount {  get; set; }
     }
 }
