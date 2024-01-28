@@ -97,7 +97,7 @@ namespace GeeekHouseAPI.Repository
                     Name = p.Subcategory.Name,
                 } : null
 
-            }).Take(8).ToListAsync();
+            }).Take(15).OrderByDescending(p=>p.Id).ToListAsync();
 
             var newFunkoPreorder = await context.Product.Where(p => p.Availability.Id ==2  && p.Category.Id == 1 && p.isActive).Select(p => new ProductModel()
             {
@@ -131,7 +131,7 @@ namespace GeeekHouseAPI.Repository
                     Name = p.Subcategory.Name,
                 } : null
 
-            }).Take(8).ToListAsync();
+            }).Take(15).OrderByDescending(p => p.Id).ToListAsync();
 
             var newDiscount = await context.Product.Where(p => p.DiscountPrice!=0 && p.Category.Id == 1 && p.isActive).Select(p => new ProductModel()
             {
@@ -165,7 +165,7 @@ namespace GeeekHouseAPI.Repository
                     Name = p.Subcategory.Name,
                 } : null
 
-            }).Take(8).ToListAsync();
+            }).Take(15).OrderByDescending(p => p.Id).ToListAsync();
 
             response.newPreorders = newFunkoPreorder;
             response.newStock = newFunkoStock;
