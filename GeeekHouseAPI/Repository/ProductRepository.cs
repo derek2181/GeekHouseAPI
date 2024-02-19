@@ -176,7 +176,7 @@ namespace GeeekHouseAPI.Repository
 
         public async Task<ProductModel> GetProductByName(string name)
         {
-            var product = await context.Product.Select(p => new ProductModel()
+            var product = await context.Product.Where(p => p.Name == name && p.isActive).Select(p => new ProductModel()
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -192,18 +192,20 @@ namespace GeeekHouseAPI.Repository
                 Description = p.Description,
                 Stock = p.Stock,
                 Subcategory=new CategoryModel {Id=p.Subcategory.Id,Name=p.Subcategory.Name }
-            }).Where(p => p.Name == name).SingleOrDefaultAsync();
+            }).SingleOrDefaultAsync();
 
-            var images = await context.Image.Where(i => i.product.Id == product.Id).Select(i => new ImageModel
+            if (product != null)
             {
-                Id=i.Id,
-                Mime=i.Mime,
-                Name=i.Name,
-                Path=i.Path
-            }).ToListAsync();
-
-          
-            product.Images = images;
+                var images = await context.Image.Where(i => i.product.Id == product.Id).Select(i => new ImageModel
+                {
+                    Id=i.Id,
+                    Mime=i.Mime,
+                    Name=i.Name,
+                    Path=i.Path
+                }).ToListAsync();
+            
+                product.Images = images;
+            }
             return product;
         }
         
@@ -269,7 +271,7 @@ namespace GeeekHouseAPI.Repository
             }).FirstOrDefaultAsync();
 
             var query = context.Product.AsQueryable();
-            query = query.Where(p => p.isActive);
+            query = query.Where(p => p.isActive).OrderByDescending(p => p.Id);
             if (categoryFilter!=null)
             {
                 query = query.Where(p => p.Category.Id == categoryType.Id && p.Subcategory.Id == categoryFilter.Id);

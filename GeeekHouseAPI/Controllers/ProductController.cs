@@ -286,8 +286,9 @@ namespace GeeekHouseAPI.Controllers
         {
             try
             {
-                
-                return Ok(await _productRepository.GetProductsAdvancedSearch(category, searchText, subcategory, orderBy,pageSize,pageIndex));
+
+                var product = await _productRepository.GetProductsAdvancedSearch(category, searchText, subcategory, orderBy, pageSize, pageIndex);
+                return Ok(product);
             }catch(Exception e)
             {
                 return BadRequest(e.Message);
